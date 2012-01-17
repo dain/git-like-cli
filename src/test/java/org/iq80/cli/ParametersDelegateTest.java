@@ -23,9 +23,9 @@ public class ParametersDelegateTest
             public String nonParamString = "a";
         }
 
-        @Option(options = "-a")
+        @Option(name = "-a")
         public boolean isA;
-        @Option(options = {"-b", "--long-b"})
+        @Option(name = {"-b", "--long-b"})
         public String bValue = "";
         @Options
         public EmptyDelegate delegate = new EmptyDelegate();
@@ -48,15 +48,15 @@ public class ParametersDelegateTest
     {
         public static class ComplexDelegate
         {
-            @Option(options = "-c")
+            @Option(name = "-c")
             public boolean isC;
-            @Option(options = {"-d", "--long-d"})
+            @Option(name = {"-d", "--long-d"})
             public Integer d;
         }
 
-        @Option(options = "-a")
+        @Option(name = "-a")
         public boolean isA;
-        @Option(options = {"-b", "--long-b"})
+        @Option(name = {"-b", "--long-b"})
         public String bValue = "";
         @Options
         public ComplexDelegate delegate = new ComplexDelegate();
@@ -82,10 +82,10 @@ public class ParametersDelegateTest
     {
         public static class LeafDelegate
         {
-            @Option(options = "--list")
+            @Option(name = "--list")
             public List<String> list = newArrayList("value1", "value2");
 
-            @Option(options = "--bool")
+            @Option(name = "--bool")
             public boolean bool;
         }
 
@@ -94,23 +94,23 @@ public class ParametersDelegateTest
             @Options
             public LeafDelegate leafDelegate = new LeafDelegate();
 
-            @Option(options = {"-d", "--long-d"})
+            @Option(name = {"-d", "--long-d"})
             public Integer d;
         }
 
         public static class NestedDelegate2
         {
-            @Option(options = "-c")
+            @Option(name = "-c")
             public boolean isC;
 
             @Options
             public NestedDelegate1 nestedDelegate1 = new NestedDelegate1();
         }
 
-        @Option(options = "-a")
+        @Option(name = "-a")
         public boolean isA;
 
-        @Option(options = {"-b", "--long-b"})
+        @Option(name = {"-b", "--long-b"})
         public String bValue = "";
 
         @Options
@@ -137,7 +137,7 @@ public class ParametersDelegateTest
     {
         public static class Delegate
         {
-            @Option(options = "-a")
+            @Option(name = "-a")
             public String a = "b";
         }
 
@@ -181,7 +181,7 @@ public class ParametersDelegateTest
     {
         public static class ComplexDelegate
         {
-            @Option(options = "-a")
+            @Option(name = "-a")
             public boolean a;
         }
 
@@ -204,7 +204,7 @@ public class ParametersDelegateTest
     {
         public static class Delegate
         {
-            @Option(options = "-a")
+            @Option(name = "-a")
             public String a;
         }
 

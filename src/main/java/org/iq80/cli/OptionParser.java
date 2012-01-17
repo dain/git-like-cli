@@ -45,13 +45,13 @@ public class OptionParser
         Preconditions.checkNotNull(typeConverter, "typeConverter is null");
 
         Field field = path.get(path.size() - 1);
-        if (!optionAnnotation.name().isEmpty()) {
-            this.name = optionAnnotation.name();
+        if (!optionAnnotation.title().isEmpty()) {
+            this.name = optionAnnotation.title();
         } else {
             this.name = field.getName();
         }
 
-        this.options = ImmutableList.copyOf(optionAnnotation.options());
+        this.options = ImmutableList.copyOf(optionAnnotation.name());
         this.description = optionAnnotation.description();
 
         if (optionAnnotation.arity() != -1) {
