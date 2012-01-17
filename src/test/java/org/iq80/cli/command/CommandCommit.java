@@ -36,9 +36,9 @@ public class CommandCommit
     @Arguments(description = "List of files")
     public List<String> files;
 
-    @Option(options = "--amend", description = "Amend")
+    @Option(name = "--amend", description = "Amend")
     public Boolean amend = false;
 
-    @Option(options = "--author")
+    @Option(name = "--author")
     public String author;
 }

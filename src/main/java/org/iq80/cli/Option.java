@@ -27,12 +27,12 @@ import static java.lang.annotation.ElementType.FIELD;
 @Target({FIELD})
 public @interface Option
 {
-    String name() default "";
+    String title() default "";
 
     /**
      * An array of allowed command line parameters (e.g. "-n", "--name", etc...).
      */
-    String[] options();
+    String[] name();
 
     /**
      * A description of this option.

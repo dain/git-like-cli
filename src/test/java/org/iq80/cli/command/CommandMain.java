@@ -22,6 +22,6 @@ import org.iq80.cli.Option;
 
 public class CommandMain
 {
-    @Option(options = "-v", description = "Verbose mode")
+    @Option(name = "-v", description = "Verbose mode")
     public Boolean verbose = false;
 }
