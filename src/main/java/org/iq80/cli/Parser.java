@@ -1,8 +1,10 @@
 package org.iq80.cli;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
+import org.iq80.cli.config.Configurator;
 import org.iq80.cli.model.ArgumentsMetadata;
 import org.iq80.cli.model.CommandGroupMetadata;
 import org.iq80.cli.model.CommandMetadata;
@@ -18,18 +20,15 @@ import static com.google.common.collect.Iterables.find;
 public class Parser
 {
     private final GlobalMetadata metadata;
+    private final Configurator configurator;
 
-    public Parser(GlobalMetadata metadata)
+    public Parser(GlobalMetadata metadata, Configurator configurator)
     {
         this.metadata = metadata;
-    }
-    
-    // global> (option value*)* (group (option value*)*)? (command (option value* | arg)* '--'? args*)?
-    public ParseState parse(String... params)
-    {
-        return parse(ImmutableList.copyOf(params));
+        this.configurator = configurator;
     }
 
+    // global> (option value*)* (group (option value*)*)? (command (option value* | arg)* '--'? args*)?
     public ParseState parse(Iterable<String> params)
     {
         PeekingIterator<String> tokens = Iterators.peekingIterator(params.iterator());
@@ -62,11 +61,10 @@ public class Parser
                 tokens.next();
                 state = state.withCommand(command).pushContext(Context.COMMAND);
 
-                while (tokens.hasNext()) {
+                do {
                     state = parseOptions(tokens, state, command.getCommandOptions());
-
                     state = parseArgs(state, tokens, command.getArguments());
-                }
+                } while (tokens.hasNext());
            }
         }
 
@@ -75,6 +73,17 @@ public class Parser
 
     private ParseState parseOptions(PeekingIterator<String> tokens, ParseState state, List<OptionMetadata> allowedOptions)
     {
+
+        for (OptionMetadata option : allowedOptions) {
+            if (option.getConfigurationKey().isPresent()) {
+                Optional<String> configured_value = configurator.lookup(option.getConfigurationKey().get());
+                if (configured_value.isPresent()) {
+                    Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), configured_value.get());
+                    state = state.withOptionValue(option, value);
+                }
+            }
+        }
+
         while (tokens.hasNext()) {
             OptionMetadata option = findOption(allowedOptions, tokens.peek());
             if (option == null) {

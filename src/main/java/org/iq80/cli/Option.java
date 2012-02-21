@@ -43,6 +43,11 @@ public @interface Option
     String[] name();
 
     /**
+     * Key to look up in configuration if no value explicitly passed
+     */
+    String configuration() default "";
+
+    /**
      * A description of this option.
      */
     String description() default "";
@@ -63,6 +68,6 @@ public @interface Option
      */
     boolean hidden() default false;
 
-    
+
     String[] allowedValues() default {};
 }

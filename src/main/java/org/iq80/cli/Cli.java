@@ -24,6 +24,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import org.iq80.cli.config.Configurator;
+import org.iq80.cli.config.MapConfigurator;
+import org.iq80.cli.config.NoOpConfigurator;
 import org.iq80.cli.model.ArgumentsMetadata;
 import org.iq80.cli.model.CommandGroupMetadata;
 import org.iq80.cli.model.CommandMetadata;
@@ -40,6 +43,8 @@ import static org.iq80.cli.ParserUtil.createInstance;
 
 public class Cli<C>
 {
+
+    private final Configurator configurator;
 
     public static CliBuilder<Object> buildCli(String name)
     {
@@ -60,7 +65,8 @@ public class Cli<C>
             TypeConverter typeConverter,
             Class<? extends C> defaultCommand,
             Iterable<Class<? extends C>> defaultGroupCommands,
-            Iterable<GroupBuilder<C>> groups)
+            Iterable<GroupBuilder<C>> groups,
+            Configurator configurator)
     {
         Preconditions.checkNotNull(name, "name is null");
         Preconditions.checkNotNull(typeConverter, "typeConverter is null");
@@ -81,6 +87,7 @@ public class Cli<C>
         }));
 
         this.metadata = MetadataLoader.loadGlobal(name, description, defaultCommandMetadata, defaultCommandGroup, commandGroups);
+        this.configurator = configurator;
     }
 
     public GlobalMetadata getMetadata()
@@ -92,12 +99,12 @@ public class Cli<C>
     {
         return parse(ImmutableList.copyOf(args));
     }
-    
+
     public C parse(Iterable<String> args)
     {
         Preconditions.checkNotNull(args, "args is null");
-        
-        Parser parser = new Parser(metadata);
+
+        Parser parser = new Parser(metadata, configurator);
         ParseState state = parser.parse(args);
 
         if (state.getCommand() == null) {
@@ -121,7 +128,7 @@ public class Cli<C>
                 command.getMetadataInjections(),
                 ImmutableMap.<Class<?>, Object>of(GlobalMetadata.class, metadata));
     }
-    
+
     private void validate(ParseState state)
     {
         CommandMetadata command = state.getCommand();
@@ -133,7 +140,7 @@ public class Cli<C>
         if (state.getParsedArguments().isEmpty() && arguments != null && arguments.isRequired()) {
             throw new ParseException("Required parameters are missing: %s", arguments.getTitle());
         }
-        
+
         if (!state.getUnparsedInput().isEmpty()) {
             throw new ParseException("Found unexpected parameters: %s", state.getUnparsedInput());
         }
@@ -162,6 +169,7 @@ public class Cli<C>
         private Class<? extends C> defaultCommand;
         private final List<Class<? extends C>> defaultCommandGroupCommands = newArrayList();
         protected final Map<String, GroupBuilder<C>> groups = newHashMap();
+        private Configurator configurator = new NoOpConfigurator();
 
         public CliBuilder(String name)
         {
@@ -217,6 +225,12 @@ public class Cli<C>
             return this;
         }
 
+        public CliBuilder<C> withConfigurator(Configurator configurator)
+        {
+            this.configurator = configurator;
+            return this;
+        }
+
         public GroupBuilder<C> withGroup(String name)
         {
             Preconditions.checkNotNull(name, "name is null");
@@ -230,7 +244,7 @@ public class Cli<C>
 
         public Cli<C> build()
         {
-            return new Cli<C>(name, description, typeConverter, defaultCommand, defaultCommandGroupCommands, groups.values());
+            return new Cli<C>(name, description, typeConverter, defaultCommand, defaultCommandGroupCommands, groups.values(), configurator);
         }
     }
 
