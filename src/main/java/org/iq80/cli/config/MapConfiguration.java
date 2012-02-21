@@ -5,11 +5,11 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
-public class MapConfigurator implements Configurator
+public class MapConfiguration implements Configuration
 {
     private final Map<String, String> config;
 
-    public <T extends Map<String, String>> MapConfigurator(T config) {
+    public <T extends Map<String, String>> MapConfiguration(T config) {
         this.config = ImmutableMap.copyOf(config);
     }
 

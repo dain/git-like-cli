@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
-import org.iq80.cli.config.Configurator;
+import org.iq80.cli.config.Configuration;
 import org.iq80.cli.model.ArgumentsMetadata;
 import org.iq80.cli.model.CommandGroupMetadata;
 import org.iq80.cli.model.CommandMetadata;
@@ -20,9 +20,9 @@ import static com.google.common.collect.Iterables.find;
 public class Parser
 {
     private final GlobalMetadata metadata;
-    private final Configurator configurator;
+    private final Configuration configurator;
 
-    public Parser(GlobalMetadata metadata, Configurator configurator)
+    public Parser(GlobalMetadata metadata, Configuration configurator)
     {
         this.metadata = metadata;
         this.configurator = configurator;

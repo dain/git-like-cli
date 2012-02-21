@@ -23,10 +23,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import org.iq80.cli.config.Configurator;
-import org.iq80.cli.config.MapConfigurator;
-import org.iq80.cli.config.NoOpConfigurator;
+import org.iq80.cli.config.Configuration;
+import org.iq80.cli.config.NoOpConfiguration;
 import org.iq80.cli.model.ArgumentsMetadata;
 import org.iq80.cli.model.CommandGroupMetadata;
 import org.iq80.cli.model.CommandMetadata;
@@ -44,7 +42,7 @@ import static org.iq80.cli.ParserUtil.createInstance;
 public class Cli<C>
 {
 
-    private final Configurator configurator;
+    private final Configuration configurator;
 
     public static CliBuilder<Object> buildCli(String name)
     {
@@ -66,7 +64,7 @@ public class Cli<C>
             Class<? extends C> defaultCommand,
             Iterable<Class<? extends C>> defaultGroupCommands,
             Iterable<GroupBuilder<C>> groups,
-            Configurator configurator)
+            Configuration configurator)
     {
         Preconditions.checkNotNull(name, "name is null");
         Preconditions.checkNotNull(typeConverter, "typeConverter is null");
@@ -169,7 +167,7 @@ public class Cli<C>
         private Class<? extends C> defaultCommand;
         private final List<Class<? extends C>> defaultCommandGroupCommands = newArrayList();
         protected final Map<String, GroupBuilder<C>> groups = newHashMap();
-        private Configurator configurator = new NoOpConfigurator();
+        private Configuration configurator = new NoOpConfiguration();
 
         public CliBuilder(String name)
         {
@@ -225,7 +223,7 @@ public class Cli<C>
             return this;
         }
 
-        public CliBuilder<C> withConfigurator(Configurator configurator)
+        public CliBuilder<C> withConfiguration(Configuration configurator)
         {
             this.configurator = configurator;
             return this;

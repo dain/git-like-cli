@@ -4,7 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.iq80.cli.config.NoOpConfigurator;
+import org.iq80.cli.config.NoOpConfiguration;
 import org.iq80.cli.model.CommandGroupMetadata;
 import org.iq80.cli.model.CommandMetadata;
 import org.iq80.cli.model.GlobalMetadata;
@@ -39,7 +39,7 @@ public class SuggestCommand
     @VisibleForTesting
     public Iterable<String> generateSuggestions()
     {
-        Parser parser = new Parser(metadata, new NoOpConfigurator());
+        Parser parser = new Parser(metadata, new NoOpConfiguration());
         ParseState state = parser.parse(arguments);
 
         Class<? extends Suggester> suggesterClass = BUILTIN_SUGGESTERS.get(state.getLocation());
