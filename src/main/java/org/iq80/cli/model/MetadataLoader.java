@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -168,13 +169,7 @@ public class MetadataLoader
                         allowedValues = null;
                     }
 
-                    final Optional<String> configurationKey;
-                    if (optionAnnotation.configuration() != null && optionAnnotation.configuration().length() > 0) {
-                        configurationKey = Optional.of(optionAnnotation.configuration());
-                    }
-                    else {
-                        configurationKey = Optional.absent();
-                    }
+                    final Optional<String> configurationKey = Optional.fromNullable(emptyToNull(optionAnnotation.configuration()));
 
                     OptionMetadata optionMetadata = new OptionMetadata(optionType, options, name, description, arity, required, hidden, allowedValues, path, configurationKey);
                     switch (optionType) {

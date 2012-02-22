@@ -9,7 +9,7 @@ public class MapConfiguration implements Configuration
 {
     private final Map<String, String> config;
 
-    public <T extends Map<String, String>> MapConfiguration(T config) {
+    public MapConfiguration(Map<String, String> config) {
         this.config = ImmutableMap.copyOf(config);
     }
 

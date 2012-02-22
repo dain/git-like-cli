@@ -1,6 +1,7 @@
 package org.iq80.cli.config;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
 import java.io.File;
@@ -14,6 +15,7 @@ public class PropertiesConfiguration implements Configuration
 
     public PropertiesConfiguration(Properties properties)
     {
+        Preconditions.checkArgument(properties != null, "may not pass null properties");
         this.properties = new Properties(properties);
     }
 
