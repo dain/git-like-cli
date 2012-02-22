@@ -1,6 +1,7 @@
 package org.iq80.cli.model;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -167,7 +169,9 @@ public class MetadataLoader
                         allowedValues = null;
                     }
 
-                    OptionMetadata optionMetadata = new OptionMetadata(optionType, options, name, description, arity, required, hidden, allowedValues, path);
+                    final Optional<String> configurationKey = Optional.fromNullable(emptyToNull(optionAnnotation.configuration()));
+
+                    OptionMetadata optionMetadata = new OptionMetadata(optionType, options, name, description, arity, required, hidden, allowedValues, path, configurationKey);
                     switch (optionType) {
                         case GLOBAL:
                             injectionMetadata.globalOptions.add(optionMetadata);
