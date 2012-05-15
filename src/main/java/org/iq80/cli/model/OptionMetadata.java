@@ -1,6 +1,7 @@
 package org.iq80.cli.model;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -23,6 +24,7 @@ public class OptionMetadata
     private final boolean hidden;
     private final Set<String> allowedValues;
     private final Set<Accessor> accessors;
+    private final Optional<String> configurationKey;
 
     public OptionMetadata(OptionType optionType,
             Iterable<String> options,
@@ -32,8 +34,10 @@ public class OptionMetadata
             boolean required,
             boolean hidden,
             Iterable<String> allowedValues,
-            Iterable<Field> path)
+            Iterable<Field> path,
+            Optional<String> configurationKey)
     {
+        this.configurationKey = configurationKey;
         Preconditions.checkNotNull(optionType, "optionType is null");
         Preconditions.checkNotNull(options, "options is null");
         Preconditions.checkArgument(!Iterables.isEmpty(options), "options is empty");
@@ -73,6 +77,7 @@ public class OptionMetadata
         this.arity = option.arity;
         this.required = option.required;
         this.hidden = option.hidden;
+        this.configurationKey = option.configurationKey;
         if (option.allowedValues != null) {
             this.allowedValues = ImmutableSet.copyOf(option.allowedValues);
         }
@@ -225,5 +230,10 @@ public class OptionMetadata
                 return input.getOptions();
             }
         };
+    }
+
+    public Optional<String> getConfigurationKey()
+    {
+        return configurationKey;
     }
 }
