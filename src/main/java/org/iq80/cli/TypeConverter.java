@@ -4,6 +4,11 @@ import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class TypeConverter
 {
@@ -42,6 +47,18 @@ public class TypeConverter
             }
             else if (Double.class.isAssignableFrom(type) || Double.TYPE.isAssignableFrom(type)) {
                 return Double.valueOf(value);
+            }
+            else if (type.isAssignableFrom(List.class)) {
+                return Arrays.asList(value.split(","));
+            }
+            else if (type.isAssignableFrom(Set.class)) {
+                return new HashSet(Arrays.asList(value.split(",")));
+            }
+            else if (String[].class.isAssignableFrom(type)) {
+                return value.split(",");
+            }
+            else if (Pattern.class.isAssignableFrom(type)) {
+                return Pattern.compile(value);
             }
         }
         catch (Exception ignored) {
