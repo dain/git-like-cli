@@ -48,10 +48,10 @@ public class TypeConverter
             else if (Double.class.isAssignableFrom(type) || Double.TYPE.isAssignableFrom(type)) {
                 return Double.valueOf(value);
             }
-            else if (List.class.isAssignableFrom(type)) {
+            else if (type.isAssignableFrom(List.class)) {
                 return Arrays.asList(value.split(","));
             }
-            else if (Set.class.isAssignableFrom(type)) {
+            else if (type.isAssignableFrom(Set.class)) {
                 return new HashSet(Arrays.asList(value.split(",")));
             }
             else if (String[].class.isAssignableFrom(type)) {
