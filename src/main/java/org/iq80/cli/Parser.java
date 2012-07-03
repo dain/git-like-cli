@@ -77,47 +77,111 @@ public class Parser
     {
         while (tokens.hasNext()) {
             OptionMetadata option = findOption(allowedOptions, tokens.peek());
+            if (option != null) {
+                tokens.next();
+                state = state.pushContext(Context.OPTION).withOption(option);
+
+                Object value;
+                if (option.getArity() == 0) {
+                    state = state.withOptionValue(option, Boolean.TRUE)
+                            .popContext();
+                }
+                else if (option.getArity() == 1) {
+                    if (tokens.hasNext()) {
+                        value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokens.next());
+                        state = state.withOptionValue(option, value)
+                                .popContext();
+                    }
+                }
+                else if (option.getArity() > 1) {
+                    ImmutableList.Builder<Object> values = ImmutableList.builder();
+
+                    int count = 0;
+                    while (count < option.getArity() && tokens.hasNext()) {
+                        values.add(TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokens.next()));
+                        ++count;
+                    }
+
+                    if (count == option.getArity()) {
+                        state = state.withOptionValue(option, values.build())
+                                .popContext();
+                    }
+                }
+                else {
+                    throw new UnsupportedOperationException("arity > 1 not yet supported");
+                }
+            }
+
+            // Handle GNU getopt long-form: --option=value
+            if (option == null) {
+                String[] split = tokens.peek().split("=", 2);
+                if (split.length > 1) {
+                    option = findOption(allowedOptions, split[0]);
+                    if (option != null && option.getArity() == 1) {
+                        Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), split[1]);
+                        state = state.withOption(option).withOptionValue(option, value);
+                        tokens.next();
+                    }
+                    else {
+                        option = null;
+                    }
+                }
+            }
+
+            // Handle classic getopt syntax
+            if (option == null && tokens.peek().matches("-[^-].*")) {
+                String tokenLeft = tokens.peek().substring(1);
+                boolean eatToken = true;
+                ParseState potentialState = state;
+                while (potentialState != null && !tokenLeft.isEmpty()) {
+                    option = findOption(allowedOptions, "-" + tokenLeft.substring(0, 1));
+                    tokenLeft = tokenLeft.substring(1);
+                    if (option == null) {
+                        potentialState = null;
+                    }
+                    else if (option.getArity() == 0) {
+                        potentialState = potentialState.withOption(option).withOptionValue(option, Boolean.TRUE);
+                    }
+                    else if (option.getArity() == 1) {
+                        if (!tokenLeft.isEmpty()) {
+                            Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokenLeft);
+                            tokenLeft = "";
+                            potentialState = potentialState.withOption(option).withOptionValue(option, value);
+                        }
+                        else {
+                            eatToken = false;
+                            tokens.next();
+                            potentialState = potentialState.pushContext(Context.OPTION).withOption(option);
+                            if (tokens.hasNext()) {
+                                Object value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokens.next());
+                                potentialState = potentialState.withOptionValue(option, value)
+                                        .popContext();
+                            }
+                         }
+                    }
+                    else {
+                        potentialState = null;
+                    }
+                }
+
+                if (potentialState == null) {
+                    option = null;
+                }
+                else {
+                    state = potentialState;
+                    if (eatToken) {
+                        tokens.next();
+                    }
+                }
+            }
+
             if (option == null) {
                 break;
-            }
-
-            tokens.next();
-            state = state.pushContext(Context.OPTION).withOption(option);
-
-            Object value;
-            if (option.getArity() == 0) {
-                state = state.withOptionValue(option, Boolean.TRUE)
-                        .popContext();
-            }
-            else if (option.getArity() == 1) {
-                if (tokens.hasNext()) {
-                    value = TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokens.next());
-                    state = state.withOptionValue(option, value)
-                            .popContext();
-                }
-            }
-            else if (option.getArity() > 1) {
-                ImmutableList.Builder<Object> values = ImmutableList.builder();
-
-                int count = 0;
-                while (count < option.getArity() && tokens.hasNext()) {
-                    values.add(TypeConverter.newInstance().convert(option.getTitle(), option.getJavaType(), tokens.next()));
-                    ++count;
-                }
-
-                if (count == option.getArity()) {
-                    state = state.withOptionValue(option, values.build())
-                            .popContext();
-                }
-            }
-            else {
-                throw new UnsupportedOperationException("arity > 1 not yet supported");
             }
         }
 
         return state;
     }
-
 
     private ParseState parseArgs(ParseState state, PeekingIterator<String> tokens, ArgumentsMetadata arguments)
     {

@@ -31,6 +31,7 @@ import org.iq80.cli.args.ArgsMultipleUnparsed;
 import org.iq80.cli.args.ArgsOutOfMemory;
 import org.iq80.cli.args.ArgsPrivate;
 import org.iq80.cli.args.ArgsRequired;
+import org.iq80.cli.args.ArgsSingleChar;
 import org.iq80.cli.args.Arity1;
 import org.iq80.cli.args.OptionsRequired;
 import org.iq80.cli.command.CommandAdd;
@@ -66,6 +67,51 @@ public class CommandTest
         Assert.assertEquals(args.floa, 1.2f, 0.1f);
         Assert.assertEquals(args.doub, 1.3f, 0.1f);
         Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
+    }
+
+    public void equalsArgs()
+            throws ParseException
+    {
+        Args1 args = singleCommandParser(Args1.class).parse("Args1",
+                "-debug", "-log=2", "-float=1.2", "-double=1.3", "-bigdecimal=1.4",
+                "-groups=unit", "a", "b", "c");
+
+        Assert.assertTrue(args.debug);
+        Assert.assertEquals(args.verbose.intValue(), 2);
+        Assert.assertEquals(args.groups, "unit");
+        Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+        Assert.assertEquals(args.floa, 1.2f, 0.1f);
+        Assert.assertEquals(args.doub, 1.3f, 0.1f);
+        Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
+    }
+
+    public void classicGetoptArgs()
+            throws ParseException
+    {
+        ArgsSingleChar args = singleCommandParser(ArgsSingleChar.class).parse("ArgsSingleChar",
+                "-lg", "-dsn", "-2f", "-z", "--Dfoo");
+
+        Assert.assertTrue(args.l);
+        Assert.assertTrue(args.g);
+        Assert.assertTrue(args.d);
+        Assert.assertEquals(args.s, "n");
+        Assert.assertFalse(args.n);
+        Assert.assertTrue(args.two);
+        Assert.assertEquals(args.f, "-z");
+        Assert.assertFalse(args.z);
+        Assert.assertEquals(args.dir, null);
+        Assert.assertEquals(args.parameters, Arrays.asList("--Dfoo"));
+    }
+
+    public void classicGetoptFailure()
+            throws ParseException
+    {
+        ArgsSingleChar args = singleCommandParser(ArgsSingleChar.class).parse("ArgsSingleChar",
+                "-lgX");
+
+        Assert.assertFalse(args.l);
+        Assert.assertFalse(args.g);
+        Assert.assertEquals(args.parameters, Arrays.asList("-lgX"));
     }
 
     /**
